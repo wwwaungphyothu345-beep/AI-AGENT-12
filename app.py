@@ -5,7 +5,7 @@ import os
 import gspread
 from google.oauth2.service_account import Credentials
 
-app = Flask(name)
+app = Flask(__name__)
 
 # API Keys & Tokens (Render ရဲ့ Environment Variables ထဲက ဖတ်ပါမည်)
 GEMINI_KEY = os.environ.get("GEMINI_KEY")
