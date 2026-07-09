@@ -5,13 +5,14 @@ import os
 import gspread
 from google.oauth2.service_account import Credentials
 
+# ❌ စောစောက name မဟုတ်ဘဲ name အမှန် ဖြစ်ရပါမယ်
 app = Flask(name)
 
 # API Keys & Tokens
 GEMINI_KEY = os.environ.get("GEMINI_KEY")
 PAGE_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")
 VERIFY_TOKEN = "aung_phyo_thu_12"
-SHEET_ID = "1CJf69o5Gp_oxtoE7tDog3KPov-ylC0jc67T4XTuFlxU"  # မင်းရဲ့ Sheet ID အမှန်
+SHEET_ID = "1CJf69o5Gp_oxtoE7tDog3KPov-ylC0jc67T4XTuFlxU"  # ကိုယ့် Sheet ID အမှန်
 
 # 📊 ၁။ Google Sheet ထဲက ပစ္စည်းစာရင်းကို လှမ်းဖတ်မည့် Function
 def get_product_database():
@@ -68,7 +69,7 @@ def ask_gemini(user_message):
         print("Gemini Error:", e)
         return "ခဏလေး စောင့်ပေးပါဗျာ။"
 
-# 🌐 ၄။ Facebook Webhook Verification (GET) - ဒီနေရာမှာ Sheet ကို လုံးဝလှမ်းမခေါ်တော့ပါဘူး
+# 🌐 ၄။ Facebook Webhook Verification (GET) - ဒီကောင် ပါမှ Facebook က စစ်လို့ရမှာပါ
 @app.route('/webhook', methods=['GET'])
 def verify():
     mode = request.args.get("hub.mode")
