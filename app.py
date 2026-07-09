@@ -94,7 +94,7 @@ def webhook():
                     user_message = messaging_event["message"]["text"]
                     
                     # Google Sheet (Orders Tab) ထဲ စာရင်းသွင်းသည်
-save_order_to_sheet(sender_id, user_message)
+                    save_order_to_sheet(sender_id, user_message)
                     
                     # Gemini ထံမှ အဖြေတောင်းသည်
                     bot_reply = ask_gemini(user_message)
@@ -108,5 +108,5 @@ save_order_to_sheet(sender_id, user_message)
                     requests.post(fb_url, json=payload)
     return Response(status=200)
 
-if name == '__main__':
+if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
