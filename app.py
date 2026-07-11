@@ -16,9 +16,17 @@ def ask_gemini(user_message):
     if not current_key:
         return "စနစ်အတွင်း API key လိုအပ်နေပါသည်"
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={current_key}"
+    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={current_key}"
     headers = {"Content-Type": "application/json"}
-    payload = {"contents": [{"parts": [{"text": user_message}]}]}
+    payload = {
+        "contents": [
+            {
+                "parts": [
+                    {"text": user_message}
+                ]
+            }
+        ]
+}
     
     try:
         response = requests.post(url, headers=headers, json=payload)
