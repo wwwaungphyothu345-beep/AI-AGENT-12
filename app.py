@@ -15,7 +15,7 @@ def ask_gemini(user_message):
         return "စနစ်အတွင်း API key လိုအပ်နေပါသည်"
 
     # 🚨 URL လမ်းကြောင်းပုံစံကို Google AI Studio ရဲ့ REST API သတ်မှတ်ချက်အတိုင်း ကွက်တိပြင်ဆင်ထားပါတယ်
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={current_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={current_key}"
     
     headers = {
         "Content-Type": "application/json"
