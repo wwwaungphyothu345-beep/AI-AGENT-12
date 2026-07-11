@@ -2,7 +2,6 @@ import os
 import requests
 from flask import Flask, request, jsonify
 
-# 🚨 ဒီစာကြောင်း ကွက်တိပါဝင်ရပါမယ် (ဒါပျောက်ရင် Render တက်မလာပါဘူး)
 app = Flask(__name__)
 
 # --- 🔒 ENV VARIABLES ---
@@ -10,32 +9,37 @@ PAGE_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")
 VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
-# 🤖 Gemini AI ထံ စာသားလှမ်းပို့သည့် Function
 def ask_gemini(user_message):
     current_key = os.environ.get("GEMINI_API_KEY")
     if not current_key:
         return "စနစ်အတွင်း API key လိုအပ်နေပါသည်"
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={current_key}"
-    headers = {"Content-Type": "application/json"}
+    # 🚨 URL လမ်းကြောင်းပုံစံကို Google AI Studio ရဲ့ REST API သတ်မှတ်ချက်အတိုင်း ကွက်တိပြင်ဆင်ထားပါတယ်
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={current_key}"
+    
+    headers = {
+        "Content-Type": "application/json"
+    }
+    
+    # 🚨 API က လက်ခံတဲ့ JSON Content ကို standard အကျဆုံး format နဲ့ တည်ဆောက်ထားပါတယ်
     payload = {
         "contents": [
             {
                 "parts": [
-                    {"text": user_message}
+                    {"text": str(user_message)}
                 ]
             }
         ]
-}
+    }
     
     try:
         response = requests.post(url, headers=headers, json=payload)
         response_data = response.json()
         
-        # 🔍 Google ဘက်က Key မှားရင် ဘာ Error ပြလဲဆိုတာ Render Log ထဲထုတ်ကြည့်ရန်
+        # Google ဘက်က Error တစ်ခုခုပြန်ပေးရင် Render Log မှာ မြင်ရအောင် ထုတ်ပြခြင်း
         if 'error' in response_data:
             print(f"❌ Google Gemini API raw error: {response_data['error']}")
-            return "Gemini API Key ပြဿနာရှိနေလို့ လဲလှယ်ပေးပါရန်။"
+            return "Gemini API Error ဖြစ်ပွားနေပါသည်။"
             
         bot_response = response_data['candidates'][0]['content']['parts'][0]['text']
         return bot_response
