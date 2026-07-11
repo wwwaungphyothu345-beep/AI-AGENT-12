@@ -7,27 +7,27 @@ app = Flask(__name__)
 # --- 🔒 ENV VARIABLES ---
 PAGE_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")
 VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN")
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
-def ask_gemini(user_message):
-    current_key = os.environ.get("GEMINI_API_KEY")
+# 🤖 OpenAI ထံ စာသားလှမ်းပို့သည့် Function (စောင့်စရာမလို၊ 429 မရှိ)
+def ask_openai(user_message):
+    current_key = os.environ.get("OPENAI_API_KEY")
     if not current_key:
         return "စနစ်အတွင်း API key လိုအပ်နေပါသည်"
 
-    # 🚨 URL လမ်းကြောင်းပုံစံကို Google AI Studio ရဲ့ REST API သတ်မှတ်ချက်အတိုင်း ကွက်တိပြင်ဆင်ထားပါတယ်
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={current_key}"
+    url = "https://api.openai.com/v1/chat/completions"
     
     headers = {
+        "Authorization": f"Bearer {current_key}",
         "Content-Type": "application/json"
     }
     
-    # 🚨 API က လက်ခံတဲ့ JSON Content ကို standard အကျဆုံး format နဲ့ တည်ဆောက်ထားပါတယ်
     payload = {
-        "contents": [
+        "model": "gpt-4o-mini",  # အမြန်ဆုံးနှင့် အငြိမ်ဆုံး မော်ဒယ်
+        "messages": [
             {
-                "parts": [
-                    {"text": str(user_message)}
-                ]
+                "role": "user",
+                "content": str(user_message)
             }
         ]
     }
@@ -36,15 +36,14 @@ def ask_gemini(user_message):
         response = requests.post(url, headers=headers, json=payload)
         response_data = response.json()
         
-        # Google ဘက်က Error တစ်ခုခုပြန်ပေးရင် Render Log မှာ မြင်ရအောင် ထုတ်ပြခြင်း
         if 'error' in response_data:
-            print(f"❌ Google Gemini API raw error: {response_data['error']}")
-            return "Gemini API Error ဖြစ်ပွားနေပါသည်။"
+            print(f"❌ OpenAI API raw error: {response_data['error']}")
+            return "OpenAI API System Error ဖြစ်ပွားနေပါသည်။"
             
-        bot_response = response_data['candidates'][0]['content']['parts'][0]['text']
+        bot_response = response_data['choices'][0]['message']['content']
         return bot_response
     except Exception as e:
-        print(f"❌ Gemini API Error: {e}")
+        print(f"❌ OpenAI Error: {e}")
         return "ခဏလေးနော်ဗျာ၊ စနစ်အတွင်း အမှားအယွင်းတစ်ခု ရှိနေလို့ပါ။"
 
 # 💬 Facebook Messenger ထံ စာပြန်ပို့သည့် Function
@@ -90,7 +89,8 @@ def webhook():
                             sender_id = messaging_event['sender']['id']
                             user_text = messaging_event['message']['text']
                             
-                            ai_reply = ask_gemini(user_text)
+                            # OpenAI ထံမှ အဖြေတောင်းယူခြင်း
+                            ai_reply = ask_openai(user_text)
                             send_fb_message(sender_id, ai_reply)
         except Exception as e:
             print(f"❌ Processing Error: {e}")
